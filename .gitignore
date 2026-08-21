@@ -1,5 +1,37 @@
 .env
 application/logs/*.php
 !application/logs/index.html
-
+/uploads/
 New folder/system.zip
+# Archives / backups
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+# Archives / backups
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# Database backups
+*.sql
+*.sql.gz
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE / editor
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
