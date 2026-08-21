@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test JS Error</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Test JS Error</h1>
+    <div id="output"></div>
+    
+    <script>
+        console.log('Before loading script...');
+    </script>
+    <script src="backend/plugins/nepali-datepicker/js/nepali.datepicker.simple.js"></script>
+    <script>
+        console.log('After loading script...');
+        console.log('$.fn.nepaliDatePicker:', typeof $.fn.nepaliDatePicker);
+        console.log('window.SimpleNepaliDatePicker:', typeof window.SimpleNepaliDatePicker);
+    </script>
+</body>
+</html>
+
+
+
+
+

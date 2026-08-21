@@ -1,0 +1,151 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#282828" />
+        <title>Login : Kanchan Vidhya Mandir Samudayik College</title>        
+        <link href="http://localhost:8000/uploads/school_content/admin_small_logo/" rel="shortcut icon" type="image/x-icon">
+        <!-- CSS -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
+        <link rel="stylesheet" href="http://localhost:8000/backend/usertemplate/assets/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://localhost:8000/backend/usertemplate/assets/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="http://localhost:8000/backend/usertemplate/assets/css/form-elements.css">
+        <link rel="stylesheet" href="http://localhost:8000/backend/usertemplate/assets/css/style.css">
+        <link rel="stylesheet" href="http://localhost:8000/backend/usertemplate/assets/css/jquery.mCustomScrollbar.min.css">
+    </head>
+    <style>
+        html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.login-admin-wrapper {
+    height: 100%;
+        background: url('http://localhost:8000/uploads/school_content/login_image/1663064530-1070210809632059d2b8b0b!1662796232-1721792380631c41c80d038!login_bg3.jpg') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 30px;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    position: relative;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.form-control {
+    width: 100%;
+    height: 45px;
+    border-radius: 8px;
+    padding-right: 40px;
+    padding-left: 12px;
+    border: 1px solid #ccc;
+}
+
+.form-control-feedback {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    pointer-events: none;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: #2575fc;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.btn-primary:hover {
+    background-color: #1a5de8;
+}
+
+.forgot {
+    display: block;
+    margin-top: 15px;
+    text-align: center;
+    color: #2575fc;
+    font-weight: 500;
+}
+
+
+    </style>
+    
+    <body class="login-admin-body">
+    <div class="login-admin-wrapper">
+        <div class="login-container">
+            <!-- Insert logo -->
+            <div class="text-center mb-3">
+                <img src="http://localhost:8000/uploads/school_content/admin_logo/1749416599-3237064371749416599!1745815207-16440109971745815207!asdadsf.png" alt="Admin Logo" class="img-fluid" style="max-height: 80px;">
+            </div>
+
+            <h3 class="text-center bolds mb-4">Admin Login</h3>
+            <h4 class="text-center">Kanchan Vidhya Mandir Samudayik College</h4>
+            <h5 class="text-center">HEMIS System</h5>
+
+            <!-- Alert messages -->
+                                    
+            <!-- Login form -->
+            <form action="http://localhost:8000/site/login" method="post">
+                <input type='hidden' name='ci_csrf_token' value=''/>
+                <div class="form-group has-feedback">
+                    <input type="text" name="username" value="" class="form-control" placeholder="Username">
+                    <span class="fa fa-envelope form-control-feedback"></span>
+                    <span class="text-danger"></span>
+                </div>
+
+                <div class="form-group has-feedback">
+                    <input type="password" name="password" value="" class="form-control" placeholder="Password">
+                    <span class="fa fa-lock form-control-feedback"></span>
+                    <span class="text-danger"></span>
+                </div>
+
+
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </form>
+
+            <a href="http://localhost:8000/site/forgotpassword" class="forgot"><i class="fa fa-key"></i> Forgot Password?</a>
+        </div>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.login-form input[type="text"], .login-form input[type="password"], .login-form textarea').on('focus', function () {
+            $(this).removeClass('input-error');
+        });
+        $('.login-form').on('submit', function (e) {
+            $(this).find('input[type="text"], input[type="password"], textarea').each(function () {
+                if ($(this).val() == "") {
+                    e.preventDefault();
+                    $(this).addClass('input-error');
+                } else {
+                    $(this).removeClass('input-error');
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,78 @@
+{
+  "name": "ernilambar/nepali-date",
+  "description": "Nepali (Bikram Sambat) calendar utilities and BS ↔ AD date conversion for PHP.",
+  "license": "MIT",
+  "type": "library",
+  "keywords": [
+    "nepali",
+    "nepali-calendar",
+    "bikram-sambat",
+    "bs",
+    "ad",
+    "gregorian",
+    "calendar",
+    "date",
+    "converter",
+    "conversion",
+    "date-converter"
+  ],
+  "authors": [
+    {
+      "name": "Nilambar Sharma",
+      "email": "nilambar@outlook.com",
+      "homepage": "https://www.nilambar.net",
+      "role": "Developer"
+    }
+  ],
+  "homepage": "https://github.com/ernilambar/nepali-date",
+  "support": {
+    "issues": "https://github.com/ernilambar/nepali-date/issues",
+    "source": "https://github.com/ernilambar/nepali-date",
+    "docs": "https://github.com/ernilambar/nepali-date#readme"
+  },
+  "require": {
+    "php": ">=5.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Nilambar\\NepaliDate\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Nilambar\\NepaliDate\\Test\\": "tests/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "ergebnis/composer-normalize": true
+    },
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "5.6"
+    },
+    "sort-packages": true
+  },
+  "scripts": {
+    "format": [
+      "composer --working-dir=build-cs update --no-interaction",
+      "build-cs/vendor/bin/phpcbf --standard=phpcs.xml.dist"
+    ],
+    "format:tests": [
+      "composer --working-dir=build-cs update --no-interaction",
+      "build-cs/vendor/bin/phpcbf --standard=phpcs.tests.xml.dist"
+    ],
+    "lint": [
+      "composer --working-dir=build-cs update --no-interaction",
+      "build-cs/vendor/bin/phpcs --standard=phpcs.xml.dist"
+    ],
+    "lint:tests": [
+      "composer --working-dir=build-cs update --no-interaction",
+      "build-cs/vendor/bin/phpcs --standard=phpcs.tests.xml.dist"
+    ],
+    "test": [
+      "composer --working-dir=build-phpunit update --no-interaction",
+      "build-phpunit/vendor/bin/phpunit --verbose"
+    ]
+  }
+}

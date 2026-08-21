@@ -1,0 +1,5 @@
+book_title,book_no,isbn_no,subject,rack_no,publish,author,edition,qty,perunitcost,postdate,description,available
+Introduction to Computer Science,1001,978-0123456789,Computer Science,R-001,Pearson Education,John Smith,3rd,3,45.50,2024-01-15,Basic computer science concepts and programming fundamentals,Yes
+Mathematics for Engineers,2001,978-0234567890,Mathematics,R-002,McGraw-Hill,Sarah Johnson,2nd,2,55.75,2024-02-20,Advanced mathematics for engineering students,Yes
+History of World Literature,LIT-001,978-0345678901,Literature,R-003,Oxford University Press,Robert Williams,1st,1,38.00,2024-03-10,Comprehensive history of world literature,Yes
+

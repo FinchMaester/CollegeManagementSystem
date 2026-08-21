@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug JS Loading</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Debug JavaScript Loading</h1>
+    <div id="output"></div>
+    
+    <script>
+        $(document).ready(function() {
+            console.log('jQuery loaded:', typeof $);
+            console.log('jQuery version:', $.fn.jquery);
+            
+            // Test loading the nepali datepicker
+            var script = document.createElement('script');
+            script.src = 'backend/plugins/nepali-datepicker/js/nepali.datepicker.min.js';
+            script.onload = function() {
+                console.log('Nepali DatePicker script loaded');
+                console.log('$.fn.nepaliDatePicker available:', typeof $.fn.nepaliDatePicker);
+                console.log('NepaliDatePicker available:', typeof window.NepaliDatePicker);
+            };
+            script.onerror = function() {
+                console.error('Failed to load Nepali DatePicker script');
+            };
+            document.head.appendChild(script);
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+

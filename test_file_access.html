@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test File Access</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Test File Access</h1>
+    <div id="output"></div>
+    
+    <script>
+        $(document).ready(function() {
+            console.log('Testing file access...');
+            
+            // Test if the file is accessible
+            $.ajax({
+                url: 'backend/plugins/nepali-datepicker/js/nepali.datepicker.simple.js',
+                type: 'GET',
+                success: function(data) {
+                    console.log('File is accessible, length:', data.length);
+                    console.log('First 100 chars:', data.substring(0, 100));
+                },
+                error: function(xhr, status, error) {
+                    console.error('File access error:', status, error);
+                    console.error('Response:', xhr.responseText);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+

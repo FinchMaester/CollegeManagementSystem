@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Datepicker Loading</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="backend/plugins/nepali-datepicker/css/nepali.datepicker.min.css">
+</head>
+<body>
+    <h1>Test Datepicker Loading</h1>
+    <input type="text" id="test_date" placeholder="Select Date" />
+    
+    <script>
+        console.log('Testing datepicker loading...');
+        console.log('jQuery available:', typeof $);
+    </script>
+    <script src="backend/plugins/nepali-datepicker/js/nepali.datepicker.min.js"></script>
+    <script>
+        console.log('After loading datepicker script...');
+        console.log('$.fn.nepaliDatePicker available:', typeof $.fn.nepaliDatePicker);
+        
+        $(document).ready(function() {
+            if (typeof $.fn.nepaliDatePicker !== 'undefined') {
+                console.log('Initializing test datepicker...');
+                $('#test_date').nepaliDatePicker({
+                    dateFormat: '%Y-%m-%d',
+                    ndpMonth: true,
+                    ndpYear: true,
+                    readOnlyInput: false
+                });
+                console.log('Test datepicker initialized successfully');
+            } else {
+                console.error('Datepicker not available');
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+

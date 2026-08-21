@@ -1,0 +1,237 @@
+{
+  "info": {
+    "_postman_id": "b8a2e1d0-4c2a-4e57-9f7c-8f6b81f3c0f4",
+    "name": "HEMIS Automation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearer_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.variables.set('now_iso', new Date().toISOString());"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login succeeded (2xx)', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "",
+                  "let json = {};",
+                  "try { json = pm.response.json(); } catch (e) {}",
+                  "",
+                  "function pickToken(obj) {",
+                  "  if (!obj || typeof obj !== 'object') return null;",
+                  "  const direct = obj.token || obj.Token || obj.accessToken || obj.bearer_token;",
+                  "  if (typeof direct === 'string' && direct.length) return direct;",
+                  "  if (obj.data) {",
+                  "    const nested = obj.data.token || obj.data.Token || obj.data.accessToken;",
+                  "    if (typeof nested === 'string' && nested.length) return nested;",
+                  "  }",
+                  "  if (obj.result) {",
+                  "    const nested2 = obj.result.token || obj.result.Token || obj.result.accessToken;",
+                  "    if (typeof nested2 === 'string' && nested2.length) return nested2;",
+                  "  }",
+                  "  return null;",
+                  "}",
+                  "",
+                  "const token = pickToken(json);",
+                  "pm.test('Token present in response', function () {",
+                  "  pm.expect(token, 'token').to.be.a('string').and.not.be.empty;",
+                  "});",
+                  "",
+                  "if (token) {",
+                  "  pm.environment.set('bearer_token', token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"collegeId\": {{collegeId}},\n  \"UniId\": 0,\n  \"isUgc\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/User/Login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "User", "Login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reference Data",
+      "item": [
+        {
+          "name": "Get Address",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/Address/GetAll",
+              "host": ["{{base_url}}"],
+              "path": ["api", "Address", "GetAll"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Infrastructure",
+      "item": [
+        {
+          "name": "Create Building",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 0,\n  \"houseName\": \"string\",\n  \"areaCoveredByBuilding\": 0,\n  \"noOfClassrooms\": 0,\n  \"areaCoveredByAllRooms\": 0,\n  \"ownershipOfBuilding\": true,\n  \"hasInternetConnection\": true,\n  \"remarks\": \"string\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/Buildings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "Buildings"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "Student Create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "firstName", "value": "KALPANA", "type": "text" },
+                { "key": "middleName", "value": "KUMARI", "type": "text" },
+                { "key": "lastName", "value": "UPADHAYAYA", "type": "text" },
+                { "key": "phoneNumber", "value": "", "type": "text" },
+                { "key": "gender", "value": "female", "type": "text" },
+                { "key": "email", "value": "", "type": "text" },
+                { "key": "admissionYearId", "value": "25", "type": "text" },
+                { "key": "hasScholarship", "value": "false", "type": "text" },
+                { "key": "isSameAsPermanent", "value": "true", "type": "text" },
+                { "key": "rollNo", "value": "", "type": "text" },
+                { "key": "campusId", "value": "12", "type": "text" },
+                { "key": "nepaliName", "value": "कल्पना कुमारी उपाध्याय", "type": "text" },
+                { "key": "doBBS", "value": "2061/07/06", "type": "text" },
+                { "key": "doBAD", "value": "2024-01-01", "type": "text" },
+                { "key": "ethnicity", "value": "Brahman", "type": "text" },
+                { "key": "nationality", "value": "nepali", "type": "text" },
+                { "key": "disabilityStatus", "value": "able", "type": "text" },
+                { "key": "disabilityType", "value": "", "type": "text" },
+                { "key": "citizenshipNo", "value": "", "type": "text" },
+                { "key": "citizenIssueDist", "value": "", "type": "text" },
+                { "key": "citizenshipFront", "type": "file", "src": "" },
+                { "key": "citizenshipBack", "type": "file", "src": "" },
+                { "key": "nidno", "value": "", "type": "text" },
+                { "key": "nidPic", "type": "file", "src": "" },
+                { "key": "ppSizePhoto", "type": "file", "src": "" },
+                { "key": "pProvince", "value": "Karnali", "type": "text" },
+                { "key": "pDistrict", "value": "Kalikot", "type": "text" },
+                { "key": "pLocalLevel", "value": "Naraharinath Rural Municipality", "type": "text" },
+                { "key": "pWardNo", "value": "3", "type": "text" },
+                { "key": "pBlockNo", "value": "0", "type": "text" },
+                { "key": "pHouseNo", "value": "", "type": "text" },
+                { "key": "pLocality", "value": "", "type": "text" },
+                { "key": "tProvince", "value": "Karnali", "type": "text" },
+                { "key": "tDistrict", "value": "Kalikot", "type": "text" },
+                { "key": "tLocalLevel", "value": "Naraharinath Rural Municipality", "type": "text" },
+                { "key": "tWardNo", "value": "3", "type": "text" },
+                { "key": "tBlockNo", "value": "0", "type": "text" },
+                { "key": "tHouseNo", "value": "", "type": "text" },
+                { "key": "tLocality", "value": "", "type": "text" },
+                { "key": "fatherName", "value": "Dashrath Bhattarai Upadhayaya", "type": "text" },
+                { "key": "fOccupation", "value": "", "type": "text" },
+                { "key": "fatherPhoneNo", "value": "", "type": "text" },
+                { "key": "fatherEmail", "value": "", "type": "text" },
+                { "key": "motherName", "value": "", "type": "text" },
+                { "key": "mOccupation", "value": "", "type": "text" },
+                { "key": "motherPhoneNo", "value": "", "type": "text" },
+                { "key": "motherEmail", "value": "", "type": "text" },
+                { "key": "guardianName", "value": "Dashrath Bhattarai Upadhayaya", "type": "text" },
+                { "key": "guardianOccupation", "value": "", "type": "text" },
+                { "key": "guardianPhone", "value": "9742226166", "type": "text" },
+                { "key": "gAddress", "value": "Naraharinath-3,Kalikot", "type": "text" },
+                { "key": "gEmail", "value": "", "type": "text" },
+                { "key": "programId", "value": "37", "type": "text" },
+                { "key": "programName", "value": "Bachelor in Education", "type": "text" },
+                { "key": "levelName", "value": "Bachelor", "type": "text" },
+                { "key": "facultyName", "value": "Education", "type": "text" },
+                { "key": "complitionYear", "value": "2084", "type": "text" },
+                { "key": "dateOfEnrollment", "value": "2025-01-08", "type": "text" },
+                { "key": "fiscalYearId", "value": "7", "type": "text" },
+                { "key": "edg", "value": "false", "type": "text" },
+                { "key": "semester", "value": "", "type": "text" },
+                { "key": "year", "value": "First", "type": "text" },
+                { "key": "programType", "value": "annual", "type": "text" },
+                { "key": "section", "value": "", "type": "text" },
+                { "key": "type", "value": "", "type": "text" },
+                { "key": "isMuktaKamaiya", "value": "false", "type": "text" },
+                { "key": "isFromMartyrFamily", "value": "false", "type": "text" },
+                { "key": "entranceScore", "value": "", "type": "text" },
+                { "key": "entranceSymbol", "value": "", "type": "text" },
+                { "key": "digitalSignature", "value": "", "type": "text" },
+                { "key": "regNoManual", "value": "", "type": "text" },
+                { "key": "religion", "value": "Hinduism", "type": "text" },
+                { "key": "rollNoManual", "value": "", "type": "text" },
+                { "key": "universityRegdNo", "value": "", "type": "text" },
+                { "key": "medium", "value": "", "type": "text" },
+                { "key": "shift", "value": "", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/Student/Create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "Student", "Create"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
+

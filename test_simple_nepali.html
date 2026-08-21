@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Nepali DatePicker Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="backend/plugins/nepali-datepicker/css/nepali.datepicker.simple.css">
+    <script src="backend/plugins/nepali-datepicker/js/nepali.datepicker.simple.js"></script>
+</head>
+<body>
+    <h1>Simple Nepali DatePicker Test</h1>
+    
+    <div style="margin: 20px;">
+        <label>Admission Date:</label><br>
+        <input type="text" id="admission_date" class="form-control date-bs" placeholder="YYYY-MM-DD (BS)" style="width: 200px; padding: 5px; border: 1px solid #ccc;">
+    </div>
+    
+    <div style="margin: 20px;">
+        <label>Date of Birth (BS):</label><br>
+        <input type="text" id="dob" class="form-control date-bs" placeholder="YYYY-MM-DD (BS)" style="width: 200px; padding: 5px; border: 1px solid #ccc;">
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            console.log('Test page loaded');
+            console.log('jQuery version:', $.fn.jquery);
+            console.log('Nepali DatePicker available:', typeof $.fn.nepaliDatePicker);
+            
+            // Test manual initialization
+            $('#admission_date').nepaliDatePicker({
+                dateFormat: '%Y-%m-%d',
+                placeholder: 'YYYY-MM-DD (BS)'
+            });
+            
+            $('#dob').nepaliDatePicker({
+                dateFormat: '%Y-%m-%d',
+                placeholder: 'YYYY-MM-DD (BS)'
+            });
+            
+            console.log('Manual initialization complete');
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
