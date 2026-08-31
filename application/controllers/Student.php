@@ -564,7 +564,6 @@ class Student extends Admin_Controller
             $this->form_validation->set_rules('class_id', $this->lang->line('class'), 'trim|required|is_natural_no_zero');
             $this->form_validation->set_rules('gender', $this->lang->line('gender'), 'trim|required');
             $this->form_validation->set_rules('dob', $this->lang->line('date_of_birth'), 'trim|required');
-            $this->form_validation->set_rules('admission_year', $this->lang->line('admission_year'), 'trim|required');
             $this->form_validation->set_rules('academic_program_duration', $this->lang->line('academic_program_duration'), 'trim|required');
             $this->form_validation->set_rules('first_name_np', $this->lang->line('first_name_np'), 'trim|required');
             // HEMIS-required fields (prevent local save that will always fail sync).
@@ -596,7 +595,7 @@ class Student extends Admin_Controller
                     'gender'            => $this->input->post('gender'),
                     'mobileno'          => $this->input->post('mobileno'),
                     'email'             => $this->input->post('email'),
-                    'admission_year'    => $this->input->post('admission_year'),
+                    'admission_year'    => $this->_resolve_admission_year_from_post(),
                     'roll_no'           => trim((string) $this->input->post('roll_no')) !== ''
                         ? trim((string) $this->input->post('roll_no')) : null,
                     'academic_program_duration' => $this->input->post('academic_program_duration'),
@@ -895,6 +894,64 @@ class Student extends Admin_Controller
             return false;
         }
         return true;
+    }
+
+    /**
+     * Derive students.admission_year (B.S. batch label) from UGC Batch metadata.
+     * UGC Batch is the source of truth; the column is kept for legacy reports/API.
+     *
+     * @param int    $ugc_batch_id
+     * @param string $batch_name_nepali
+     * @param string $posted_admission_year
+     * @param string $existing_value Prior admission_year on edit
+     * @return string
+     */
+    private function _resolve_admission_year_from_batch($ugc_batch_id, $batch_name_nepali = '', $posted_admission_year = '', $existing_value = '')
+    {
+        $nep = trim((string) $batch_name_nepali);
+        if (preg_match('/^\d{4}$/', $nep)) {
+            return $nep;
+        }
+
+        $ugc_batch_id = (int) $ugc_batch_id;
+        if ($ugc_batch_id > 0 && $this->db->table_exists('ugc_batches')) {
+            $row = $this->db->select('batch_nepali')
+                ->from('ugc_batches')
+                ->where('id', $ugc_batch_id)
+                ->get()
+                ->row_array();
+            if (!empty($row['batch_nepali'])) {
+                $from_batch = trim((string) $row['batch_nepali']);
+                if (preg_match('/^\d{4}$/', $from_batch)) {
+                    return $from_batch;
+                }
+                if ($from_batch !== '') {
+                    return $from_batch;
+                }
+            }
+        }
+
+        $posted = trim((string) $posted_admission_year);
+        if ($posted !== '') {
+            return $posted;
+        }
+
+        $existing_value = trim((string) $existing_value);
+        return $existing_value !== '' ? $existing_value : '0000';
+    }
+
+    /**
+     * @param string $existing_value Prior admission_year on edit
+     * @return string
+     */
+    private function _resolve_admission_year_from_post($existing_value = '')
+    {
+        return $this->_resolve_admission_year_from_batch(
+            (int) $this->input->post('ugc_batch_id'),
+            (string) $this->input->post('batch_name_nepali'),
+            (string) $this->input->post('admission_year'),
+            (string) $existing_value
+        );
     }
 
     public function _ugc_fiscal_year_exists($ugc_fiscal_year_id)
@@ -1724,7 +1781,7 @@ class Student extends Admin_Controller
                     'first_name_np'     => $this->input->post('first_name_np'),
                     'middle_name_np'    => $this->input->post('middle_name_np'),
                     'last_name_np'      => $this->input->post('last_name_np'),
-                    'admission_year'    => $this->input->post('admission_year'),
+                    'admission_year'    => $this->_resolve_admission_year_from_post(isset($student['admission_year']) ? $student['admission_year'] : ''),
                     'academic_program_duration' => $this->input->post('academic_program_duration'),
                     'gender'            => $this->input->post('gender'),
                     'mobileno'          => $this->input->post('mobileno'),
@@ -2979,8 +3036,6 @@ class Student extends Admin_Controller
                 'label' => 'HEMIS / UGC (required for sync)',
                 'columns' => array(
                     array('col' => 'admission_no', 'label' => 'Admission No', 'req' => true),
-                    array('col' => 'admission_year', 'label' => 'Admission Year (B.S.)', 'req' => false),
-                    array('col' => 'admissionYearId', 'label' => 'Admission Year ID', 'req' => true),
                     array('col' => 'ugc_program_id', 'label' => 'UGC Program ID', 'req' => true),
                     array('col' => 'ugc_batch_id', 'label' => 'UGC Batch ID', 'req' => true),
                     array('col' => 'ugc_fiscal_year_id', 'label' => 'UGC Fiscal Year ID', 'req' => true),
@@ -3078,7 +3133,7 @@ class Student extends Admin_Controller
 
         $sample_rows = array(
             array(
-                'admission_no' => '1050878781', 'admission_year' => '2081', 'admissionYearId' => '20',
+                'admission_no' => '1050878781',
                 'ugc_program_id' => '33', 'ugc_batch_id' => '22', 'ugc_fiscal_year_id' => '4',
                 'roll_no' => '1', 'admission_date' => '2025-02-02', 'academic_program_duration' => '4', 'complition_year' => '2085',
                 'firstname' => 'Ram', 'middlename' => '', 'lastname' => 'Singh',
@@ -3097,7 +3152,7 @@ class Student extends Admin_Controller
                 'category_id' => '2', 'is_active' => 'yes',
             ),
             array(
-                'admission_no' => '787810502', 'admission_year' => '2081', 'admissionYearId' => '20',
+                'admission_no' => '787810502',
                 'ugc_program_id' => '33', 'ugc_batch_id' => '22', 'ugc_fiscal_year_id' => '4',
                 'roll_no' => '2', 'admission_date' => '2025-02-03', 'academic_program_duration' => '4', 'complition_year' => '2085',
                 'firstname' => 'Sita', 'middlename' => '', 'lastname' => 'Sharma',
@@ -3447,6 +3502,39 @@ class Student extends Admin_Controller
             }
         }
 
+        if (!empty($out['ugc_batch_id']) && $this->db->table_exists('ugc_batches')) {
+            $batch_row = $this->db->select('name, batch_nepali')
+                ->from('ugc_batches')
+                ->where('id', (int) $out['ugc_batch_id'])
+                ->limit(1)
+                ->get()
+                ->row_array();
+            if (!empty($batch_row)) {
+                if (isset($allowed['batch_name']) && empty($out['batch_name'])) {
+                    $out['batch_name'] = $batch_row['name'];
+                }
+                if (isset($allowed['batch_name_nepali']) && empty($out['batch_name_nepali'])) {
+                    $out['batch_name_nepali'] = $batch_row['batch_nepali'];
+                }
+            }
+            $bid = (int) $out['ugc_batch_id'];
+            if (isset($allowed['admissionYearId']) && (empty($out['admissionYearId']) || (int) $out['admissionYearId'] < 1)) {
+                $out['admissionYearId'] = $bid;
+            }
+            if (isset($allowed['batch_id']) && (empty($out['batch_id']) || (int) $out['batch_id'] < 1)) {
+                $out['batch_id'] = $bid;
+            }
+            if (isset($allowed['admission_year'])) {
+                $posted_ay = isset($out['admission_year']) ? $out['admission_year'] : (isset($row['admission_year']) ? $row['admission_year'] : '');
+                $out['admission_year'] = $this->_resolve_admission_year_from_batch(
+                    $bid,
+                    isset($out['batch_name_nepali']) ? $out['batch_name_nepali'] : '',
+                    $posted_ay,
+                    ''
+                );
+            }
+        }
+
         if (isset($allowed['ugc_fiscal_year_id'])) {
             $fy = isset($out['ugc_fiscal_year_id']) ? (int) $out['ugc_fiscal_year_id'] : 0;
             if ($fy < 1 && $this->db->table_exists('ugc_fiscal_years')) {
@@ -3480,23 +3568,6 @@ class Student extends Admin_Controller
             }
         }
 
-        if (!empty($out['ugc_batch_id']) && $this->db->table_exists('ugc_batches')) {
-            $batch_row = $this->db->select('name, batch_nepali')
-                ->from('ugc_batches')
-                ->where('id', (int) $out['ugc_batch_id'])
-                ->limit(1)
-                ->get()
-                ->row_array();
-            if (!empty($batch_row)) {
-                if (isset($allowed['batch_name']) && empty($out['batch_name'])) {
-                    $out['batch_name'] = $batch_row['name'];
-                }
-                if (isset($allowed['batch_name_nepali']) && empty($out['batch_name_nepali'])) {
-                    $out['batch_name_nepali'] = $batch_row['batch_nepali'];
-                }
-            }
-        }
-
         $this->_student_import_resolve_ugc_address($out, $row, 'p', $allowed);
         $this->_student_import_resolve_ugc_address($out, $row, 't', $allowed);
 
@@ -3522,7 +3593,7 @@ class Student extends Admin_Controller
             return sprintf($this->lang->line('student_import_missing_required'), $this->lang->line('permanent_ward_no'));
         }
         if (isset($allowed['admissionYearId']) && empty($out['admissionYearId'])) {
-            return sprintf($this->lang->line('student_import_missing_required'), 'Admission Year ID (HEMIS)');
+            return sprintf($this->lang->line('student_import_missing_required'), 'UGC Batch ID (HEMIS)');
         }
         if (isset($allowed['ugc_program_id'])) {
             $pid = isset($out['ugc_program_id']) ? (int) $out['ugc_program_id'] : 0;

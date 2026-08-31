@@ -50,23 +50,8 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                 </div>
                                             </div>
                                         <?php }?>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label for="admission_year"><?php echo $this->lang->line('admission_year'); ?></label><small class="req"> *</small>
-                                                <select id="admission_year" name="admission_year" class="form-control">
-                                                    <option value="">Select Year</option>
-                                                    <option value="2076" <?php echo set_select('admission_year', '2076'); ?>>2076</option>
-                                                    <option value="2077" <?php echo set_select('admission_year', '2077'); ?>>2077</option>
-                                                    <option value="2078" <?php echo set_select('admission_year', '2078'); ?>>2078</option>
-                                                    <option value="2079" <?php echo set_select('admission_year', '2079'); ?>>2079</option>
-                                                    <option value="2080" <?php echo set_select('admission_year', '2080'); ?>>2080</option>
-                                                    <option value="2081" <?php echo set_select('admission_year', '2081'); ?>>2081</option>
-                                                    <option value="2082" <?php echo set_select('admission_year', '2082'); ?>>2082</option>
-                                                </select>
-                                                <span class="text-danger"><?php echo form_error('admission_year'); ?></span>
-                                            </div>
-                                        </div>
                                     </div>
+                                    <input type="hidden" id="admission_year" name="admission_year" value="<?php echo set_value('admission_year'); ?>" />
                                     <div class="row">
                                         <div class="col-md-3">
                                             <div class="form-group">
@@ -1789,31 +1774,6 @@ $(function () {
 
 <script type="text/javascript">
     $(document).ready(function () {
-    // Optional helper: auto-fill HEMIS admissionYearId from BS admission_year via config map.
-    var hemisAdmissionYearMap = <?php
-        $hemisCfg = $this->config->item('hemis');
-        $map = (is_array($hemisCfg) && isset($hemisCfg['admission_year_id_map']) && is_array($hemisCfg['admission_year_id_map']))
-            ? $hemisCfg['admission_year_id_map'] : array();
-        echo json_encode($map);
-    ?>;
-    function tryAutofillAdmissionYearId() {
-        var $ay = $('#admission_year');
-        var $aid = $('#admissionYearId');
-        var $hint = $('#admissionYearId_hint');
-        if ($ay.length === 0 || $aid.length === 0) return;
-        if ($aid.val()) return;
-        var key = ($ay.val() || '').toString();
-        if (!key) return;
-        if (hemisAdmissionYearMap && hemisAdmissionYearMap[key]) {
-            $aid.val(String(hemisAdmissionYearMap[key]));
-            if ($hint.length) {
-                $hint.text('Auto-filled from admission year ' + key + ' (config map).');
-            }
-        }
-    }
-    $('#admission_year').off('change.hemisAid').on('change.hemisAid', tryAutofillAdmissionYearId);
-    tryAutofillAdmissionYearId();
-
     // HEMIS/UGC lists do not depend on local section — load in parallel with sections (avoid waterfall).
     loadUgcPrograms();
     loadUgcBatches();
@@ -1892,7 +1852,6 @@ function loadUgcBatches(preselect) {
             }
             $('#ugc_batch_id').html(html);
             syncBatchNamesFromUgc();
-            tryAutoselectUgcBatchFromAdmissionYear();
         },
         error: function () {
             $('#ugc_batch_id').html('<option value="">Error loading UGC batches</option>');
@@ -1922,36 +1881,14 @@ function syncBatchNamesFromUgc() {
     if ($('#admissionYearId').length) {
         $('#admissionYearId').val(id);
     }
+    // Legacy admission_year column — mirror UGC batch Nepali year (B.S.).
+    if ($('#admission_year').length && /^\d{4}$/.test(nep)) {
+        $('#admission_year').val(nep);
+    }
 }
 
 $(document).on('change', '#ugc_batch_id', function () {
     syncBatchNamesFromUgc();
-});
-
-function tryAutoselectUgcBatchFromAdmissionYear() {
-    var $ay = $('#admission_year');
-    var $batch = $('#ugc_batch_id');
-    if ($ay.length === 0 || $batch.length === 0) return;
-
-    // Don't override if operator already picked a batch.
-    if ($batch.val()) return;
-
-    var ay = ($ay.val() || '').toString();
-    if (!ay) return;
-
-    // Match Admission Year (BS) to batchNepali.
-    var matches = $batch.find('option[data-nepali]').filter(function () {
-        return String($(this).data('nepali')) === ay;
-    });
-    if (matches.length === 1) {
-        $batch.val(matches.first().val());
-        syncBatchNamesFromUgc();
-    }
-}
-
-$('#admission_year').off('change.ugcBatchAuto').on('change.ugcBatchAuto', function () {
-    // Wait until UGC batches are loaded; if not yet loaded, this will do nothing.
-    tryAutoselectUgcBatchFromAdmissionYear();
 });
 
 function loadUgcFiscalYears(preselect) {

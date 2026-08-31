@@ -2,7 +2,6 @@
 $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 $hemis_ck = (isset($import_hemis_checklist) && is_array($import_hemis_checklist)) ? $import_hemis_checklist : array();
 $hemis_ready = !empty($hemis_ck['ready']);
-$hemis_map = isset($hemis_ck['admission_year_id_map']) && is_array($hemis_ck['admission_year_id_map']) ? $hemis_ck['admission_year_id_map'] : array();
 $import_schema = (isset($import_schema) && is_array($import_schema)) ? $import_schema : array('groups' => array(), 'sample_rows' => array());
 ?>
 <div class="content-wrapper" style="min-height: 946px;">
@@ -154,41 +153,22 @@ $import_schema = (isset($import_schema) && is_array($import_schema)) ? $import_s
                                             </div>
                                         </div>
                                         <div class="tab-pane" id="import-tab-admission">
-                                            <p class="text-muted small"><?php echo $this->lang->line('student_import_admission_year_lookup_help'); ?></p>
-                                            <div class="input-group" style="max-width:300px;">
-                                                <input type="text" id="import_admission_year_lookup" class="form-control input-sm" placeholder="B.S. year e.g. 2081" />
-                                                <span class="input-group-btn">
-                                                    <button type="button" class="btn btn-default btn-sm" id="btn-import-admission-year-lookup">Lookup</button>
-                                                </span>
-                                            </div>
-                                            <p id="import_admission_year_lookup_result" class="help-block"></p>
-                                            <?php if (!empty($hemis_map)) { ?>
-                                            <table class="table table-condensed table-bordered" style="font-size:12px;max-width:280px;">
-                                                <thead><tr><th>B.S.</th><th>admissionYearId</th></tr></thead>
+                                            <p class="text-muted small"><?php echo $this->lang->line('student_import_batch_admission_help'); ?></p>
+                                            <?php if (!empty($hemis_ck['batches_ref'])) { ?>
+                                            <table class="table table-condensed table-bordered" style="font-size:12px;max-width:520px;">
+                                                <thead><tr><th>ugc_batch_id</th><th>Batch</th><th>B.S. year</th></tr></thead>
                                                 <tbody>
-                                                <?php foreach ($hemis_map as $bs => $aid) { ?>
-                                                    <tr class="import-ref-row" style="cursor:pointer" data-copy="<?php echo (int) $aid; ?>">
-                                                        <td><?php echo htmlspecialchars((string) $bs, ENT_QUOTES, 'UTF-8'); ?></td>
-                                                        <td><code><?php echo (int) $aid; ?></code></td>
-                                                    </tr>
-                                                <?php } ?>
-                                                </tbody>
-                                            </table>
-                                            <?php } elseif (!empty($hemis_ck['admission_years_used'])) { ?>
-                                            <table class="table table-condensed table-bordered" style="font-size:12px;">
-                                                <thead><tr><th>B.S.</th><th>admissionYearId</th><th>Count</th></tr></thead>
-                                                <tbody>
-                                                <?php foreach ($hemis_ck['admission_years_used'] as $ay) { ?>
-                                                    <tr>
-                                                        <td><?php echo htmlspecialchars((string) $ay['admission_year'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                                        <td><code><?php echo (int) $ay['admissionYearId']; ?></code></td>
-                                                        <td><?php echo (int) $ay['student_count']; ?></td>
+                                                <?php foreach ($hemis_ck['batches_ref'] as $br) { ?>
+                                                    <tr class="import-ref-row" style="cursor:pointer" data-copy="<?php echo (int) $br['id']; ?>">
+                                                        <td><code><?php echo (int) $br['id']; ?></code></td>
+                                                        <td><?php echo htmlspecialchars($br['name'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                                        <td><?php echo !empty($br['batch_nepali']) ? htmlspecialchars($br['batch_nepali'], ENT_QUOTES, 'UTF-8') : '—'; ?></td>
                                                     </tr>
                                                 <?php } ?>
                                                 </tbody>
                                             </table>
                                             <?php } else { ?>
-                                            <p class="text-warning small"><?php echo $this->lang->line('student_import_admission_year_not_mapped'); ?></p>
+                                            <p class="text-warning small"><?php echo $this->lang->line('student_import_batch_admission_empty'); ?></p>
                                             <?php } ?>
                                         </div>
                                     </div>
@@ -391,7 +371,6 @@ $import_schema = (isset($import_schema) && is_array($import_schema)) ? $import_s
 <script type="text/javascript">
 var baseUrl = '<?php echo base_url(); ?>';
 var baseurl = baseUrl;
-var importHemisAdmissionYearMap = <?php echo json_encode($hemis_map); ?>;
 var importLang = {
     cacheOk: <?php echo json_encode(sprintf($this->lang->line('student_import_cache_ok'), '%d')); ?>,
     cacheMissing: <?php echo json_encode($this->lang->line('student_import_cache_missing')); ?>,
@@ -400,7 +379,6 @@ var importLang = {
     refreshing: <?php echo json_encode($this->lang->line('student_import_metadata_refreshing')); ?>,
     refreshed: <?php echo json_encode($this->lang->line('student_import_metadata_refreshed')); ?>,
     refreshFailed: <?php echo json_encode($this->lang->line('student_import_metadata_refresh_failed')); ?>,
-    yearNotMapped: <?php echo json_encode($this->lang->line('student_import_admission_year_not_mapped')); ?>,
     addressEmpty: <?php echo json_encode('No matches. Refresh metadata or try another district.'); ?>,
     addressLoading: <?php echo json_encode($this->lang->line('student_import_address_loading')); ?>,
     addressLoadFailed: <?php echo json_encode($this->lang->line('student_import_address_load_failed')); ?>,
@@ -466,9 +444,6 @@ function importRenderHemisChecklist(checklist) {
             return '<tr class="import-ref-row" style="cursor:pointer"><td><code>' + parseInt(r.id, 10) + '</code></td><td>' + importEscapeHtml(r.name) + '</td></tr>';
         });
     }
-    if (checklist.admission_year_id_map) {
-        importHemisAdmissionYearMap = checklist.admission_year_id_map;
-    }
     if (checklist.districts_ref && checklist.districts_ref.length) {
         var $distSel = $('#import_address_district');
         var keep = $distSel.val();
@@ -488,26 +463,12 @@ function importRenderHemisChecklist(checklist) {
     importLoadUgcAddressesForImport();
 }
 
-$(document).on('click', '.import-ref-row code', function () {
-    var t = $(this).text();
+$(document).on('click', '.import-ref-row code, .import-ref-row[data-copy]', function () {
+    var t = $(this).is('code') ? $(this).text() : String($(this).closest('tr').data('copy') || '');
     if (window.prompt) {
         window.prompt('Copy to CSV:', t);
     }
 });
-
-function importLookupAdmissionYearId() {
-    var key = $.trim($('#import_admission_year_lookup').val() || '');
-    var $out = $('#import_admission_year_lookup_result');
-    if (!key) {
-        $out.html('');
-        return;
-    }
-    if (importHemisAdmissionYearMap && importHemisAdmissionYearMap[key]) {
-        $out.html('<strong class="text-success">admissionYearId = <code>' + parseInt(importHemisAdmissionYearMap[key], 10) + '</code></strong>');
-        return;
-    }
-    $out.html('<span class="text-warning">' + importEscapeHtml(importLang.yearNotMapped) + '</span>');
-}
 
 function importAddrNormRow(row) {
     return {
@@ -734,10 +695,6 @@ $('input[name="import_addr_prefix"]').on('change', function () {
     importAddrRenderCsvPreview();
 });
 
-$('#btn-import-admission-year-lookup').on('click', importLookupAdmissionYearId);
-$('#import_admission_year_lookup').on('keypress', function (e) {
-    if (e.which === 13) { e.preventDefault(); importLookupAdmissionYearId(); }
-});
 $('#btn-import-address-search').on('click', importSearchAddresses);
 $('#import_address_q').on('keypress', function (e) {
     if (e.which === 13) { e.preventDefault(); importSearchAddresses(); }
